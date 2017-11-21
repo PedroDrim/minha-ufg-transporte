@@ -16,7 +16,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.LocalListActivity"></activity>
+
+        <activity
+            android:name=".view.LocalListActivity"
+            android:parentActivityName=".view.MapActivity" >
+
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".view.MapActivity" />
+
+        </activity>
+
+
+        <activity
+            android:name=".view.MapActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>

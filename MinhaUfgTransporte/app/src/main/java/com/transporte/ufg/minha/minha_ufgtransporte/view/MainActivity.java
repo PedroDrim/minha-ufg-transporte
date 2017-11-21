@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()){
 
-                            abrirTelaPrincipal();
+                            abrirActivityMaps();
                             Toast.makeText(
                                     MainActivity.this,
                                     "Login efetuado com sucesso",
@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void abrirTelaPrincipal(){
+    private void abrirActivityMaps(){
         Intent intentAbrirTelaPrincipal = new Intent(
                 MainActivity.this,
-                LocalListActivity.class
+                MapActivity.class
         );
         startActivity(intentAbrirTelaPrincipal);
     }
