@@ -34,32 +34,34 @@ public class MainActivity extends AppCompatActivity {
         edtSenha = findViewById(R.id.edtSenha);
         btnLogar = findViewById(R.id.btnLogar);
 
-        btnLogar.setOnClickListener(new View.OnClickListener() {
+        abrirActivityMaps();
 
-            @Override
-            public void onClick(View v) {
-
-                boolean validation1 = !edtEmail.getText().toString().equals("");
-                boolean validation2 = !edtSenha.getText().toString().equals("");
-
-                if ( validation1 && validation2) {
-
-                    String email = edtEmail.getText().toString();
-                    String senha = edtSenha.getText().toString();
-                    usuario = new Usuario();
-                    usuario.setEmail(email);
-                    usuario.setSenha(senha);
-
-                    validarLogin();
-                } else {
-                    Toast.makeText(
-                            MainActivity.this,
-                            "Preencha os campos de e-mail e senha!",
-                            Toast.LENGTH_SHORT
-                    ).show();
-                }
-            }
-        });
+//        btnLogar.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//                boolean validation1 = !edtEmail.getText().toString().equals("");
+//                boolean validation2 = !edtSenha.getText().toString().equals("");
+//
+//                if ( validation1 && validation2) {
+//
+//                    String email = edtEmail.getText().toString();
+//                    String senha = edtSenha.getText().toString();
+//                    usuario = new Usuario();
+//                    usuario.setEmail(email);
+//                    usuario.setSenha(senha);
+//
+//                    validarLogin();
+//                } else {
+//                    Toast.makeText(
+//                            MainActivity.this,
+//                            "Preencha os campos de e-mail e senha!",
+//                            Toast.LENGTH_SHORT
+//                    ).show();
+//                }
+//            }
+//        });
 
     }
 

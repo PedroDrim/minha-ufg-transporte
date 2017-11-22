@@ -2,4 +2,5 @@
     <string name="app_name">Minha-Ufg Transporte</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="menu">Meus Locais</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
