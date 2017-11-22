@@ -18,7 +18,7 @@
         </activity>
 
         <activity
-            android:name=".view.LocalListActivity"
+            android:name=".view.PlaceListActivity"
             android:parentActivityName=".view.MapActivity" >
 
         <!-- Parent activity meta-data to support 4.0 and lower -->

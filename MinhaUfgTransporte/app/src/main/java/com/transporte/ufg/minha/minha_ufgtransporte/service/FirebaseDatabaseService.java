@@ -1,7 +1,7 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.service;
 
 import com.google.firebase.database.DatabaseReference;
-import com.transporte.ufg.minha.minha_ufgtransporte.presenter.LocalEventListener;
+import com.transporte.ufg.minha.minha_ufgtransporte.presenter.MyPlaceEventListener;
 
 /**
  * Created by pedro on 21/11/17.
@@ -9,15 +9,16 @@ import com.transporte.ufg.minha.minha_ufgtransporte.presenter.LocalEventListener
 
 public class FirebaseDatabaseService {
 
-    public void eventGetLocal(String userId){
+    private DatabaseReference databaseReference;
 
-        LocalEventListener listener = new LocalEventListener();
-        DatabaseReference databaseReference = ConfiguracaoFirebase.getFirebaseDatabase();
-        databaseReference
-                .child("lista")
-                .child(userId)
-                .addValueEventListener(listener);
+    public FirebaseDatabaseService(DatabaseReference databaseReference){
+        this.databaseReference = databaseReference;
+    }
 
-        databaseReference.keepSynced(true);
+    public void eventGetLocal(){
+
+        MyPlaceEventListener listener = new MyPlaceEventListener();
+        this.databaseReference.addValueEventListener(listener);
+        this.databaseReference.keepSynced(true);
     }
 }
