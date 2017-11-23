@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -37,6 +38,9 @@ import com.transporte.ufg.minha.minha_ufgtransporte.R;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean gpsPermission;
+    private Location lastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +49,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        checkGPSPermission();
 
         initializePlacesAutoComplete();
 
@@ -117,33 +119,69 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        LatLng goiania;
         mMap = googleMap;
         mMap.setMinZoomPreference(10.0f);
 
 
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        String locationProvider = LocationManager.GPS_PROVIDER;
+        if(gpsPermission) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+            goiania = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
 
-        //TODO: PEDIR ACESSO AO LOCAL ATUAL DO USUARIO
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-//
-//        mMap.setMyLocationEnabled(true);
-//        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            Log.e("GPS_PERMISSION", "entrou no gpsPermission ");
+        }
 
-        LatLng goiania = new LatLng(-16.665136, -49.286041);
-        //LatLng goiania = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        else {
+            Log.e("GPS_PERMISSION", "nao permitiu gpsPermission ");
+            goiania = new LatLng(-16.665136, -49.286041);
+        }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
 
     }
+
+    private void checkGPSPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    gpsPermission = true;
+
+                    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                    String locationProvider = LocationManager.GPS_PROVIDER;
+
+                    assert locationManager != null;
+                     lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+
+                    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.map);
+                    mapFragment.getMapAsync(this);
+
+                } else {
+
+                   gpsPermission = false;
+                }
+
+            }
+        }
+    }
 }
+
