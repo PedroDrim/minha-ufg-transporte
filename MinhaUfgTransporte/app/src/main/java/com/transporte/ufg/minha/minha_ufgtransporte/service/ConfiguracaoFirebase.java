@@ -14,8 +14,14 @@ public class ConfiguracaoFirebase {
     private static FirebaseAuth autenticacao;
 
     public static DatabaseReference getFirebaseDatabase() {
-        if (referenciaFirebase == null) {
+        if (referenciaFirebase == null){
             referenciaFirebase = FirebaseDatabase.getInstance().getReference();
+
+            if(autenticacao != null){
+                referenciaFirebase = referenciaFirebase
+                        .child("lista")
+                        .child(ConfiguracaoFirebase.getFirebaseAuth().getUid());
+            }
         }
         return referenciaFirebase;
     }
@@ -26,5 +32,4 @@ public class ConfiguracaoFirebase {
         }
         return autenticacao;
     }
-
 }

@@ -34,6 +34,10 @@
             android:label="@string/title_activity_map"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
+        <service
+            android:name=".service.IntentMyPlace"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
