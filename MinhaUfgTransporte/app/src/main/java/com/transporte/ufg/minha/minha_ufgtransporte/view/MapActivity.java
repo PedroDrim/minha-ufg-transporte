@@ -91,7 +91,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void abrirActivityMeusLocais() {
         Intent intentAbrirTelaPrincipal = new Intent(
                 MapActivity.this,
-                LocalListActivity.class
+                PlaceListActivity.class
         );
         startActivity(intentAbrirTelaPrincipal);
     }

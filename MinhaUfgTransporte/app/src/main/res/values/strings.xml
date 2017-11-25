@@ -6,4 +6,10 @@
     <string name="google_maps_key">AIzaSyDBI0B1IO4pJaErhWJvlcVppYKoct7zYk8</string>
     <string name="google_directions_key">AIzaSyDyqzTOrrujfsNbE5YQFLdXRhPeAxeGx78</string>
     <string name="internet_route_error">Não foi possível procurar a rota. Por favor verifique a conexão com a internet</string>
+    <string name="flag_key">FLAG</string>
+    <string name="enum_update">Atualizar</string>
+    <string name="enum_insert">Inserir</string>
+    <string name="invalid_login">Usuário ou senha inválidos</string>
+    <string name="firebase_node">lista</string>
+    <string name="login_fill_input">Preencha os campos de e-mail e senha!</string>
 </resources>
