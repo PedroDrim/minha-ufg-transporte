@@ -9,10 +9,16 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.AuthListener;
-import com.transporte.ufg.minha.minha_ufgtransporte.service.ConfiguracaoFirebase;
+import com.transporte.ufg.minha.minha_ufgtransporte.service.FirebaseConfiguration;
 
+/**
+ * Activity inicial do aplicativo
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Autenticacao do usuario
+     */
     private FirebaseAuth autenticacao;
 
     @Override
@@ -21,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    /**
+     * Realiza o login do usuario ao sistema
+     * @param view Botao definido no .xml
+     */
     public void authUser(View view){
 
         EditText edtEmail = findViewById(R.id.edtEmail);
@@ -36,15 +46,20 @@ public class MainActivity extends AppCompatActivity {
 
             validarLogin(email, senha);
         } else {
-            String text = "Preencha os campos de e-mail e senha!";
+            String text = this.getString(R.string.login_fill_input);
             Toast.makeText( MainActivity.this, text, Toast.LENGTH_SHORT ).show();
         }
 
     }
 
+    /**
+     * Valicacao do login do usuario
+     * @param email email inserido
+     * @param senha senha inserida
+     */
     private void validarLogin(String email, String senha) {
 
-        autenticacao = ConfiguracaoFirebase.getFirebaseAuth();
+        autenticacao = FirebaseConfiguration.getFirebaseAuth();
         autenticacao.signInWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(new AuthListener(this));
     }

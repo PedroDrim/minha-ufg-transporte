@@ -7,26 +7,56 @@ import android.view.ViewGroup;
 
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.MyPlace;
-import com.transporte.ufg.minha.minha_ufgtransporte.model.RecyclerClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by pedro on 23/11/17.
+ * Classe que gerencia a insercao e remocao dinamica dentro de um LinearLayout
+ * @see MyPlaceAdapter
  */
-
 public class MyPlaceAdapter extends RecyclerView.Adapter<MyPlaceHolder> {
 
+    /**
+     * Lista de locais
+     */
     private List<MyPlace> myPlaceList;
-    private RecyclerClickListener clickListener;
 
+    /**
+     * Construtor que inicializa a lista de locais
+     */
     public MyPlaceAdapter() {
         this.myPlaceList = new ArrayList<>();
     }
 
-    public void setOnItemClickListener(RecyclerClickListener clickListener) {
-        this.clickListener = clickListener;
+    /**
+     * Adiciona novo local ao LinearLayout
+     * @param dataObj Local a ser adicionado
+     * @param index Indice do local referente
+     */
+    public void addItem(MyPlace dataObj, int index) {
+        if(!this.myPlaceList.contains(dataObj)) {
+            this.myPlaceList.add(index, dataObj);
+            notifyItemInserted(index);
+        }
+    }
+
+    /**
+     * Remove um local do LinearLayout
+     * @param index Indice do local a ser removido
+     */
+    public void deleteItem(int index) {
+        this.myPlaceList.remove(index);
+        notifyItemRemoved(index);
+    }
+
+    /**
+     * Limpa a lista de locais do LinearLayout
+     */
+    public void clearList(){
+        for(int index = 0; index < this.getItemCount(); index++){
+            this.deleteItem(index);
+        }
     }
 
     @Override
@@ -34,7 +64,7 @@ public class MyPlaceAdapter extends RecyclerView.Adapter<MyPlaceHolder> {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cardview_row, parent, false);
 
-        MyPlaceHolder myPlaceHolder = new MyPlaceHolder(this.clickListener, view);
+        MyPlaceHolder myPlaceHolder = new MyPlaceHolder(this.myPlaceList, view);
         return myPlaceHolder;
     }
 
@@ -46,24 +76,6 @@ public class MyPlaceAdapter extends RecyclerView.Adapter<MyPlaceHolder> {
     @Override
     public int getItemCount() {
         return this.myPlaceList.size();
-    }
-
-    public void addItem(MyPlace dataObj, int index) {
-        if(!this.myPlaceList.contains(dataObj)) {
-            this.myPlaceList.add(index, dataObj);
-            notifyItemInserted(index);
-        }
-    }
-
-    public void deleteItem(int index) {
-        this.myPlaceList.remove(index);
-        notifyItemRemoved(index);
-    }
-
-    public void clearList(){
-        for(int index = 0; index < this.getItemCount(); index++){
-            this.deleteItem(index);
-        }
     }
 
 }

@@ -5,12 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
+import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.MyPlace;
-import com.transporte.ufg.minha.minha_ufgtransporte.presenter.MyPlaceClickListener;
+import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.component.MyPlaceAdapter;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.component.MyPlaceRefreshListener;
 
@@ -19,16 +19,40 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Set;
 
+/**
+ * Activity para listagem do locais obtidos no banco de dados
+ */
 public class PlaceListActivity extends AppCompatActivity {
 
-    private String tag = "MINHAUFG";
+    /**
+     * Flag para gerenciar os componentes da pagina
+     */
     private boolean loaded;
 
+    /**
+     * Instancia do SwipeRefreshLayout
+     */
     private SwipeRefreshLayout swipeRefreshLayout;
-    private MyPlaceRefreshListener myPlaceRefreshListener;
+
+    /**
+     * Instancia do RecyclerView
+     */
     private RecyclerView mRecyclerView;
+
+    /**
+     * Objeto que gerencia os eventos de recarga da pagina
+     * @see MyPlaceRefreshListener
+     */
+    private MyPlaceRefreshListener myPlaceRefreshListener;
+
+    /**
+     * Objeto responsavel por converter os Locais obtidos no banco de dados em elementos da View
+     */
     private MyPlaceAdapter mAdapter;
 
+    /**
+     * Construtor que inicializa a flag de gerenciamento
+     */
     public PlaceListActivity(){
         this.loaded = false;
     }
@@ -44,10 +68,6 @@ public class PlaceListActivity extends AppCompatActivity {
         }
     }
 
-    public void addMyPlace(View view){
-        Log.d(tag, "Adicionando novo MyPlace");
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -61,6 +81,10 @@ public class PlaceListActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    /**
+     * Evento que sera realizado quando um Set de locais for Inscrito
+     * @param setMyPlace Set dos locais obtidos do banco de dados
+     */
     @Subscribe
     public void onEvent(Set<MyPlace> setMyPlace){
 
@@ -75,6 +99,17 @@ public class PlaceListActivity extends AppCompatActivity {
         this.swipeRefreshLayout.setRefreshing(false);
     }
 
+    /**
+     * Adiciona um novo local ao banco
+     * @param view View referente ao FloatingButton do .xml
+     */
+    public void addMyPlace(View view){
+        OpenActivity.openCrudMapActivity(view.getContext(), Flag.INSERT);
+    }
+
+    /**
+     * Inicializa os componentes da activity
+     */
     private void loadActivityComponents(){
 
         this.myPlaceRefreshListener = new MyPlaceRefreshListener(this);
@@ -84,7 +119,6 @@ public class PlaceListActivity extends AppCompatActivity {
         this.swipeRefreshLayout.setOnRefreshListener(this.myPlaceRefreshListener);
 
         this.mAdapter = new MyPlaceAdapter();
-        this.mAdapter.setOnItemClickListener( new MyPlaceClickListener());
 
         this.mRecyclerView = findViewById(R.id.myPlace_recycler_view);
         this.mRecyclerView.setHasFixedSize(true);

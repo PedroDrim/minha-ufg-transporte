@@ -1,24 +1,29 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.service;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.transporte.ufg.minha.minha_ufgtransporte.view.MainActivity;
-import com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity;
+import com.transporte.ufg.minha.minha_ufgtransporte.R;
+import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 
 /**
- * Created by pedro on 22/11/17.
+ * Classe que autentica a entrada do usuario
  */
-
 public class AuthListener implements OnCompleteListener<AuthResult>{
 
+    /**
+     * Contexto da aplicacao
+     */
     private Context context;
 
+    /**
+     * Construtor que define o contexto da aplicacao
+     * @param context Contexto da aplicacao
+     */
     public AuthListener(Context context) {
         this.context = context;
     }
@@ -27,21 +32,11 @@ public class AuthListener implements OnCompleteListener<AuthResult>{
     public void onComplete(@NonNull Task<AuthResult> task) {
 
         if (task.isSuccessful()){
-            this.abrirActivityMaps();
-            this.showToast( "Login efetuado com sucesso" );
+            OpenActivity.openMapActivity(this.context);
         }else {
-            this.showToast( "Usuário ou senha inválidos" );
+            String text = context.getString(R.string.invalid_login);
+            Toast.makeText( this.context, text, Toast.LENGTH_SHORT ).show();
         }
     }
 
-    private void abrirActivityMaps(){
-        Intent intentAbrirTelaPrincipal =
-                new Intent( this.context, MapActivity.class );
-
-        this.context.startActivity(intentAbrirTelaPrincipal);
-    }
-
-    private void showToast(String text){
-        Toast.makeText( this.context, text, Toast.LENGTH_SHORT ).show();
-    }
 }

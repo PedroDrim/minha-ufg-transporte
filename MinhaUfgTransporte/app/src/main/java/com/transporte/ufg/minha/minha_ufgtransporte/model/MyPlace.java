@@ -3,42 +3,84 @@ package com.transporte.ufg.minha.minha_ufgtransporte.model;
 import com.google.firebase.database.Exclude;
 
 /**
- * Created by pedro on 21/11/17.
+ * Classe referente a um local pre-definido pelo usuario
  */
-
 public class MyPlace {
 
+    /**
+     * Chave de no do firebase database
+     */
     @Exclude
     private String pushKey;
 
+    /**
+     * Identificador do local
+     */
     private String identificador;
+
+    /**
+     * Latitude do local
+     */
     private double latitude;
+
+    /**
+     * Longitude do local
+     */
     private double longitude;
 
+    /**
+     * Construtor para serializacao do dado retornado pelo firebase
+     */
     public MyPlace(){}
 
+    /**
+     * Construtor para a inicializacao de um novo local
+     * @param identificador identificador do novo local
+     * @param latitude latitude do novo local
+     * @param longitude longitude do novo local
+     */
     public MyPlace(String identificador, double latitude, double longitude) {
         this.identificador = identificador;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
+    /**
+     * Obtem o identificador do local
+     * @return identificador do local
+     */
     public String getIdentificador() {
         return identificador;
     }
 
+    /**
+     * Obtem a latitude do local
+     * @return latitude do local
+     */
     public double getLatitude() {
         return latitude;
     }
 
+    /**
+     * Obtem a longitude do local
+     * @return longitude do local
+     */
     public double getLongitude() {
         return longitude;
     }
 
+    /**
+     * Obtem a chave de no do objeto
+     * @return chave de no do objeto
+     */
     public String getPushKey() {
         return pushKey;
     }
 
+    /**
+     * Define a chave de no do objeto
+     * @param pushKey chave de no do objeto no firebase
+     */
     public void setPushKey(String pushKey) {
         this.pushKey = pushKey;
     }
