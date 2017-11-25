@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -56,7 +57,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean gpsPermission;
     private Location lastKnownLocation;
-    LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,82 +71,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    private void initializePlacesAutoComplete() {
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-        autocompleteFragment.setBoundsBias(new LatLngBounds(
-                new LatLng(-16.810330, -49.375050),
-                new LatLng(-16.580921, -49.164289)));
-
-
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                LatLng destination = place.getLatLng();
-                double destinationLat = destination.latitude;
-                double destinationLng = destination.longitude;
-//              Log.i("place_id", place.getId());
-
-//              mMap.addMarker(new MarkerOptions().position(destination).title(place.getName().toString()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10), 2000, null);
-
-                com.google.maps.model.LatLng origin = new com.google.maps.model.LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-                com.google.maps.model.LatLng destinationDir = new com.google.maps.model.LatLng(destinationLat, destinationLng);
-
-                DateTime now = new DateTime();
-                try {
-                    DirectionsResult result = DirectionsApi.newRequest(getGeoContext())
-                            .mode(TravelMode.DRIVING)
-                            .origin(origin)
-                            .destination(destinationDir)
-                            .departureTime(now)
-                            .alternatives(true)
-                            .transitMode(TransitMode.BUS)
-                            .await();
-
-
-                    addMarkersToMap(result, mMap);
-                    addPolyline(result, mMap);
-
-                } catch (ApiException | InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Solucionar o erro.
-                Log.i("ERRO NO MAPS", "Ocorreu um erro: " + status);
-            }
-        });
-    }
-
-    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-        int routesNum = results.routes.length;
-        for(int i = 0; i < routesNum; i++) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
-        }
-    }
-
-    private String getEndLocationTitle(DirectionsResult results){
-        return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + "\n Distance :" + results.routes[0].legs[0].distance.humanReadable;
-    }
-
-    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
-        int routesNum = results.routes.length;
-        for(int i = 0; i < routesNum; i++) {
-            List<LatLng> decodedPath = PolyUtil.decode(results.routes[i].overviewPolyline.getEncodedPath());
-            mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(-16776961));
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_locais, menu);
         return true;
     }
@@ -155,7 +81,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.crud_locais:
-                //add the function to perform here
                 this.abrirActivityMeusLocais();
                 return (true);
         }
@@ -171,39 +96,89 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         startActivity(intentAbrirTelaPrincipal);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    private void initializePlacesAutoComplete() {
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        LatLng goiania;
-        mMap = googleMap;
-        mMap.setMinZoomPreference(10.0f);
+        autocompleteFragment.setBoundsBias(new LatLngBounds(
+                new LatLng(-16.810330, -49.375050),
+                new LatLng(-16.580921, -49.164289)));
 
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                LatLng destination = place.getLatLng();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10), 2000, null);
+//              Log.i("place_id", place.getId());
 
-        if(gpsPermission) {
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                requestRoutes(destination.latitude, destination.longitude);
+            }
 
-            goiania = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            @Override
+            public void onError(Status status) {
+                // TODO: Solucionar o erro.
+                Log.i("ERRO NO MAPS", "Ocorreu um erro: " + status);
+            }
+        });
+    }
 
-            Log.e("GPS_PERMISSION", "entrou no gpsPermission ");
+    private GeoApiContext getGeoContext() {
+        GeoApiContext geoApiContext = new GeoApiContext();
+        return geoApiContext.setQueryRateLimit(3)
+                .setApiKey(getString(R.string.google_directions_key))
+                .setConnectTimeout(5, TimeUnit.SECONDS)
+                .setReadTimeout(5, TimeUnit.SECONDS)
+                .setWriteTimeout(5, TimeUnit.SECONDS);
+    }
+
+    private void requestRoutes(double destinationLat, double destinationLng) {
+        com.google.maps.model.LatLng origin = new com.google.maps.model.LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        com.google.maps.model.LatLng destinationDir = new com.google.maps.model.LatLng(destinationLat, destinationLng);
+
+        DateTime now = new DateTime();
+        try {
+            DirectionsResult result = DirectionsApi.newRequest(getGeoContext())
+                    .mode(TravelMode.TRANSIT)
+                    .origin(origin)
+                    .destination(destinationDir)
+                    .departureTime(now)
+                    .alternatives(true)
+                    .transitMode(TransitMode.BUS)
+                    .await();
+
+            addMarkersToMap(result, mMap);
+            addPolyline(result, mMap);
+
+        } catch (ApiException | InterruptedException e) {
+            Toast.makeText(
+                    this,
+                    R.string.internet_route_error,
+                    Toast.LENGTH_LONG
+            ).show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        else {
-            Log.e("GPS_PERMISSION", "nao permitiu gpsPermission ");
-            goiania = new LatLng(-16.665136, -49.286041);
+    private String getEndLocationTitle(DirectionsResult results){
+        return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + "\n Distance :" + results.routes[0].legs[0].distance.humanReadable;
+    }
+
+    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        int routesNum = results.routes.length;
+        for(int i = 0; i < routesNum; i++) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+    }
 
+    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
+        int routesNum = results.routes.length;
+        String colors[] = this.getResources().getStringArray(R.array.colors);
+        for(int i = 0; i < routesNum; i++) {
+            List<LatLng> decodedPath = PolyUtil.decode(results.routes[i].overviewPolyline.getEncodedPath());
+            mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor(colors[i]))).setZIndex(i);
+        }
     }
 
     private void checkGPSPermission(){
@@ -218,15 +193,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private GeoApiContext getGeoContext() {
-        GeoApiContext geoApiContext = new GeoApiContext();
-        return geoApiContext.setQueryRateLimit(3)
-                .setApiKey(getString(R.string.google_directions_key))
-                .setConnectTimeout(5, TimeUnit.SECONDS)
-                .setReadTimeout(5, TimeUnit.SECONDS)
-                .setWriteTimeout(5, TimeUnit.SECONDS);
-    }
-
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -239,8 +205,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     gpsPermission = true;
 
-                    String locationProvider = LocationManager.GPS_PROVIDER;
-
                     lastKnownLocation = getLastKnownLocation();
                     Log.i("LAST-KNOWN-LOCATION", "" + lastKnownLocation);
 
@@ -249,8 +213,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mapFragment.getMapAsync(this);
 
                 } else {
-
-                   gpsPermission = false;
+                    gpsPermission = false;
                 }
 
             }
@@ -258,7 +221,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private Location getLastKnownLocation() {
-        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        LocationManager mLocationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
@@ -273,5 +236,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return bestLocation;
     }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng goiania;
+        mMap = googleMap;
+        mMap.setMinZoomPreference(10.0f);
+
+        if(gpsPermission) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+            goiania = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        }
+
+        else {
+            goiania = new LatLng(-16.665136, -49.286041);
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+
+    }
+
 }
 

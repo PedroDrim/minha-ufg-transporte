@@ -5,4 +5,5 @@
     <string name="title_activity_maps">Map</string>
     <string name="google_maps_key">AIzaSyDBI0B1IO4pJaErhWJvlcVppYKoct7zYk8</string>
     <string name="google_directions_key">AIzaSyDyqzTOrrujfsNbE5YQFLdXRhPeAxeGx78</string>
+    <string name="internet_route_error">Não foi possível procurar a rota. Por favor verifique a conexão com a internet</string>
 </resources>
