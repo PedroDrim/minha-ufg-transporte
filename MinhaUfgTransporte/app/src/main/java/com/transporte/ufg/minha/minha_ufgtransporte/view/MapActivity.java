@@ -33,7 +33,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.DirectionsApi;
+import com.google.maps.GeoApiContext;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TransitMode;
+import com.google.maps.model.TravelMode;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
+
+import org.joda.time.DateTime;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -41,6 +56,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean gpsPermission;
     private Location lastKnownLocation;
+    LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +83,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                LatLng latlng = place.getLatLng();
-                mMap.addMarker(new MarkerOptions().position(latlng).title(place.getName().toString()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15), 2000, null);
-                Log.i("place_id", place.getId());
+                LatLng destination = place.getLatLng();
+                double destinationLat = destination.latitude;
+                double destinationLng = destination.longitude;
+//              Log.i("place_id", place.getId());
+
+//              mMap.addMarker(new MarkerOptions().position(destination).title(place.getName().toString()));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10), 2000, null);
+
+                com.google.maps.model.LatLng origin = new com.google.maps.model.LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+                com.google.maps.model.LatLng destinationDir = new com.google.maps.model.LatLng(destinationLat, destinationLng);
+
+                DateTime now = new DateTime();
+                try {
+                    DirectionsResult result = DirectionsApi.newRequest(getGeoContext())
+                            .mode(TravelMode.DRIVING)
+                            .origin(origin)
+                            .destination(destinationDir)
+                            .departureTime(now)
+                            .alternatives(true)
+                            .transitMode(TransitMode.BUS)
+                            .await();
+
+
+                    addMarkersToMap(result, mMap);
+                    addPolyline(result, mMap);
+
+                } catch (ApiException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -79,6 +122,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Log.i("ERRO NO MAPS", "Ocorreu um erro: " + status);
             }
         });
+    }
+
+    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        int routesNum = results.routes.length;
+        for(int i = 0; i < routesNum; i++) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
+        }
+    }
+
+    private String getEndLocationTitle(DirectionsResult results){
+        return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + "\n Distance :" + results.routes[0].legs[0].distance.humanReadable;
+    }
+
+    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
+        int routesNum = results.routes.length;
+        for(int i = 0; i < routesNum; i++) {
+            List<LatLng> decodedPath = PolyUtil.decode(results.routes[i].overviewPolyline.getEncodedPath());
+            mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(-16776961));
+        }
     }
 
     @Override
@@ -117,6 +180,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng goiania;
@@ -153,6 +218,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    private GeoApiContext getGeoContext() {
+        GeoApiContext geoApiContext = new GeoApiContext();
+        return geoApiContext.setQueryRateLimit(3)
+                .setApiKey(getString(R.string.google_directions_key))
+                .setConnectTimeout(5, TimeUnit.SECONDS)
+                .setReadTimeout(5, TimeUnit.SECONDS)
+                .setWriteTimeout(5, TimeUnit.SECONDS);
+    }
+
     @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -165,11 +239,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     gpsPermission = true;
 
-                    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
                     String locationProvider = LocationManager.GPS_PROVIDER;
 
-                    assert locationManager != null;
-                     lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+                    lastKnownLocation = getLastKnownLocation();
+                    Log.i("LAST-KNOWN-LOCATION", "" + lastKnownLocation);
 
                     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                             .findFragmentById(R.id.map);
@@ -182,6 +255,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             }
         }
+    }
+
+    private Location getLastKnownLocation() {
+        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            @SuppressLint("MissingPermission") Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
 }
 
