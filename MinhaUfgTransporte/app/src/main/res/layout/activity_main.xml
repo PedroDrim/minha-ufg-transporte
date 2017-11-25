@@ -29,6 +29,7 @@ tools:context="com.transporte.ufg.minha.minha_ufgtransporte.view.MainActivity">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/btnLogar"
+    android:onClick="authUser"
     android:text="Login"/>
 
 </LinearLayout>
