@@ -1,5 +1,6 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.model;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 
 /**
@@ -83,6 +84,14 @@ public class MyPlace {
      */
     public void setPushKey(String pushKey) {
         this.pushKey = pushKey;
+    }
+
+    /**
+     * Converte para LatLng
+     * @return Instancia do objeto LatLng.
+     */
+    public LatLng toLatLng(){
+        return new LatLng(this.latitude, this.longitude);
     }
 
     @Override

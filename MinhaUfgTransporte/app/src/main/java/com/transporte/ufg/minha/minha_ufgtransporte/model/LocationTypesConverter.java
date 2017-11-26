@@ -14,6 +14,10 @@ public class LocationTypesConverter {
         return(new com.google.maps.model.LatLng(location.getLatitude(), location.getLongitude()));
     }
 
+    public static LatLng locationToAndroidLatLng(Location location){
+        return(new LatLng(location.getLatitude(), location.getLongitude()));
+    }
+
     public static LatLng MapsLatLngToAndroidLatLng(com.google.maps.model.LatLng latLng){
         return(new LatLng(latLng.lat, latLng.lng));
     }

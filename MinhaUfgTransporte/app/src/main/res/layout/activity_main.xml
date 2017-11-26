@@ -12,24 +12,25 @@ android:gravity="center"
 android:orientation="vertical"
 tools:context="com.transporte.ufg.minha.minha_ufgtransporte.view.LoginActivity">
 
-<EditText
-    android:id="@+id/edtEmail"
-    android:layout_width="match_parent"
-    android:layout_height="58dp"
-    android:hint="email..."
-    android:inputType="textEmailAddress" />
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:hint="email..."
+        android:inputType="textEmailAddress" />
 
-<EditText
-    android:layout_width="match_parent"
-    android:id="@+id/edtSenha"
-    android:hint="senha..."
-    android:inputType="textPassword"
-    android:layout_height="wrap_content" />
-<Button
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/btnLogar"
-    android:onClick="authUser"
-    android:text="Login"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:id="@+id/edtSenha"
+        android:hint="senha..."
+        android:inputType="textPassword"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnLogar"
+        android:onClick="authUser"
+        android:text="Login" />
 
 </LinearLayout>

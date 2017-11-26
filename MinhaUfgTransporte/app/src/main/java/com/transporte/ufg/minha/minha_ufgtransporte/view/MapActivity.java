@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.auth.FirebaseUser;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
+import com.transporte.ufg.minha.minha_ufgtransporte.model.LocationTypesConverter;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.GpsInstance;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.FirebaseConfiguration;
@@ -60,7 +61,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             this.mMap.setMyLocationEnabled(true);
             this.mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-            goiania = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            goiania = LocationTypesConverter.locationToAndroidLatLng(lastKnownLocation);
         } else {
             goiania = new LatLng(-16.665136, -49.286041);
         }

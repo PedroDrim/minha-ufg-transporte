@@ -12,4 +12,6 @@
     <string name="invalid_login">Usuário ou senha inválidos</string>
     <string name="firebase_node">lista</string>
     <string name="login_fill_input">Preencha os campos de e-mail e senha!</string>
+    <string name="insert_myPlace">Local adicionado com sucesso.</string>
+    <string name="update_myPlace">Local atualizado com sucesso.</string>
 </resources>

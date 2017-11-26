@@ -7,6 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".view.CrudMapActivity">
 
-    <include layout="@layout/content_map" />
+    <include layout="@layout/content_crud_map" />
 
 </android.support.constraint.ConstraintLayout>
