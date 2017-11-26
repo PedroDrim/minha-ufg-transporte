@@ -10,7 +10,7 @@ android:layout_marginLeft="16dp"
 android:layout_marginRight="16dp"
 android:gravity="center"
 android:orientation="vertical"
-tools:context="com.transporte.ufg.minha.minha_ufgtransporte.view.MainActivity">
+tools:context="com.transporte.ufg.minha.minha_ufgtransporte.view.LoginActivity">
 
 <EditText
     android:id="@+id/edtEmail"

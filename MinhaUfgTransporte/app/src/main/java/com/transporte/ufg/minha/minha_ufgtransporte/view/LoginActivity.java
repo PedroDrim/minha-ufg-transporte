@@ -12,9 +12,9 @@ import com.transporte.ufg.minha.minha_ufgtransporte.service.AuthListener;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.FirebaseConfiguration;
 
 /**
- * Activity inicial do aplicativo
+ * Activity para conectar no firebase
  */
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     /**
      * Autenticacao do usuario
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             validarLogin(email, senha);
         } else {
             String text = this.getString(R.string.login_fill_input);
-            Toast.makeText( MainActivity.this, text, Toast.LENGTH_SHORT ).show();
+            Toast.makeText( LoginActivity.this, text, Toast.LENGTH_SHORT ).show();
         }
 
     }

@@ -6,7 +6,9 @@ import android.content.Intent;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.CrudMapActivity;
+import com.transporte.ufg.minha.minha_ufgtransporte.view.LoginActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity;
+import com.transporte.ufg.minha.minha_ufgtransporte.view.PlaceListActivity;
 
 /**
  * Classe que abre outras activities
@@ -21,9 +23,9 @@ public class OpenActivity {
      */
     public static void openCrudMapActivity(Context context, Flag flag){
         String flagKey = context.getString(R.string.flag_key);
-        Intent intentAbrirTelaPrincipal = new Intent( context, CrudMapActivity.class );
-        intentAbrirTelaPrincipal.putExtra(flagKey, flag.valor);
-        context.startActivity(intentAbrirTelaPrincipal);
+        Intent intent = new Intent( context, CrudMapActivity.class );
+        intent.putExtra(flagKey, flag.valor);
+        context.startActivity(intent);
     }
 
     /**
@@ -32,8 +34,23 @@ public class OpenActivity {
      * @see MapActivity
      */
     public static void openMapActivity(Context context){
-        Intent intentAbrirTelaPrincipal = new Intent( context, MapActivity.class );
-        context.startActivity(intentAbrirTelaPrincipal);
+        Intent intent = new Intent( context, MapActivity.class );
+        context.startActivity(intent);
+    }
+
+    /**
+     * Abre a PlaceListActivity
+     * @param context contexto da aplicacao
+     * @see com.transporte.ufg.minha.minha_ufgtransporte.view.PlaceListActivity
+     */
+    public static void openPlaceListActivity(Context context){
+        Intent intent = new Intent( context, PlaceListActivity.class );
+        context.startActivity(intent);
+    }
+
+    public static void openLoginActivity(Context context){
+        Intent intent = new Intent( context, LoginActivity.class );
+        context.startActivity(intent);
     }
 
 }

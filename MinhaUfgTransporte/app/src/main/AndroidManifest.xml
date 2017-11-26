@@ -16,13 +16,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".view.MainActivity">
+
+        <activity
+            android:name=".view.MapActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@style/AppTheme.NoActionBar" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <activity android:name=".view.LoginActivity"/>
+
         <activity
             android:name=".view.PlaceListActivity"
 
@@ -52,11 +60,6 @@
                 android:value="@integer/google_play_services_version" />
 
         </activity>
-
-        <activity
-            android:name=".view.MapActivity"
-            android:label="@string/title_activity_map"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
