@@ -64,10 +64,10 @@ public class PlaceListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_list);
 
-        if(!loaded) {
+        //if(!loaded) {
             this.loadActivityComponents();
             this.loaded = true;
-        }
+        //}
     }
 
     @Override

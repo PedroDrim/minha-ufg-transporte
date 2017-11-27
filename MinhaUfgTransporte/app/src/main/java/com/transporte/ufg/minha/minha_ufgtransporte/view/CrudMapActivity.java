@@ -63,8 +63,8 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
             MyPlace oldMyPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
             MyPlace newMyPlace = new MyPlace(
                     this.textView.getText().toString(),
-                    oldMyPlace.getLatitude(),
-                    oldMyPlace.getLongitude()
+                    clickPosition.latitude,
+                    clickPosition.longitude
             );
 
             myPlaceDAO.updateMyPlace(oldMyPlace.getPushKey(), newMyPlace);
@@ -79,6 +79,8 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         Toast.makeText( CrudMapActivity.this, text, Toast.LENGTH_SHORT ).show();
+
+
         this.finish();
     }
 

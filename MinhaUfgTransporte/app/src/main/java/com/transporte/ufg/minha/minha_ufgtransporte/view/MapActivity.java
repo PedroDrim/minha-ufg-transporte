@@ -29,13 +29,14 @@ import com.transporte.ufg.minha.minha_ufgtransporte.presenter.GpsInstance;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.FirebaseConfiguration;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.UfgPlaceSelectListener;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private GpsInstance gpsInstance;
-    private Location mLastKnownLocation;
-
 
     public MapActivity(){
         this.gpsInstance = new GpsInstance(this);
@@ -54,7 +55,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+    }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @SuppressLint("MissingPermission")
@@ -74,8 +87,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         getDeviceLocation();
-
-        this.initializePlacesAutoComplete(mLastKnownLocation);
     }
 
     @Override
@@ -103,7 +114,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return (super.onOptionsItemSelected(item));
     }
 
-    private void initializePlacesAutoComplete(Location lastKnownLocation) {
+    @Subscribe
+    public void initializePlacesAutoComplete(Location lastKnownLocation) {
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -138,7 +150,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = (Location) task.getResult();
+                            Location mLastKnownLocation = (Location) task.getResult();
+                            EventBus.getDefault().post(mLastKnownLocation);
+
                             LatLng latlng = LocationTypesConverter
                                     .locationToAndroidLatLng(mLastKnownLocation);
 
