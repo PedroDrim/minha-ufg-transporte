@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.CrudMapActivity">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -30,9 +30,13 @@
             <EditText
                 android:layout_width="match_parent"
                 android:id="@+id/identificador"
-                android:hint="Identificador"
+                android:hint="Nome do local"
                 android:inputType="textAutoCorrect"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:backgroundTint="@android:color/transparent"
+                android:drawableStart="@drawable/ic_edit_gray_24dp"
+                android:drawablePadding="5dp"
+                />
 
         </android.support.v7.widget.CardView>
 
@@ -48,11 +52,12 @@
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_check_white_24dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:onClick="getPoint"/>
+        android:onClick="getPoint"
+        app:backgroundTint="@android:color/holo_green_dark"/>
 
 </android.support.design.widget.CoordinatorLayout>
