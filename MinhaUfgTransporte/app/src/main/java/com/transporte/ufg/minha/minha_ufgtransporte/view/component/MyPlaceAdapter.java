@@ -51,6 +51,16 @@ public class MyPlaceAdapter extends RecyclerView.Adapter<MyPlaceHolder> {
     }
 
     /**
+     * Remove um local do LinearLayout
+     * @param myPlace Instancia do local a ser removido
+     */
+    public void deleteItem(MyPlace myPlace) {
+        int index = this.myPlaceList.indexOf(myPlace);
+        this.myPlaceList.remove(index);
+        notifyItemRemoved(index);
+    }
+
+    /**
      * Limpa a lista de locais do LinearLayout
      */
     public void clearList(){

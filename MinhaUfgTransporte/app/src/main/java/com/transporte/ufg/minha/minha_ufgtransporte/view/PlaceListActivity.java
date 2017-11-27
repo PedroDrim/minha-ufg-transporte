@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
@@ -108,12 +110,37 @@ public class PlaceListActivity extends AppCompatActivity {
         this.swipeRefreshLayout.setRefreshing(false);
     }
 
+    public void removeMyPlace(View view){
+        RelativeLayout layout = (RelativeLayout) view.getParent();
+        MyPlace myPlace = getMyPlaceByView(layout);
+        this.mAdapter.deleteItem(myPlace);
+    }
+
     /**
      * Adiciona um novo local ao banco
      * @param view View referente ao FloatingButton do .xml
      */
     public void addMyPlace(View view){
         OpenActivity.openCrudMapActivity(view.getContext(), Flag.INSERT);
+    }
+
+    private MyPlace getMyPlaceByView(RelativeLayout relativeLayout){
+        TextView viewIdentificador = (TextView) relativeLayout.getChildAt(0);
+        TextView viewLatitude = (TextView) relativeLayout.getChildAt(1);
+        TextView viewLongitude = (TextView) relativeLayout.getChildAt(2);
+
+        String identificador = viewIdentificador.getText().toString();
+
+        String textLatitude = viewLatitude.getText().toString();
+        textLatitude = textLatitude.split(" ")[1];
+
+        String textLongitude = viewLongitude.getText().toString();
+        textLongitude = textLongitude.split(" ")[1];
+
+        double latitude = Double.valueOf(textLatitude);
+        double longitude = Double.valueOf(textLongitude);
+
+        return( new MyPlace(identificador, latitude, longitude));
     }
 
     /**

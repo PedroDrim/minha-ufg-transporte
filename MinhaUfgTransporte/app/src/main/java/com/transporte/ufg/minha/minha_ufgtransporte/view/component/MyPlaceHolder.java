@@ -2,11 +2,13 @@ package com.transporte.ufg.minha.minha_ufgtransporte.view.component;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.MyPlace;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.RecyclerClickListener;
+import com.transporte.ufg.minha.minha_ufgtransporte.model.RemoveButtonClickListener;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.MyPlaceClickListener;
 
 import java.util.List;
