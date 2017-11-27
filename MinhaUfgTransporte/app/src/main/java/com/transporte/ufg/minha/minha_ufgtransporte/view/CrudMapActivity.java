@@ -3,7 +3,6 @@ package com.transporte.ufg.minha.minha_ufgtransporte.view;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -17,12 +16,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
-import com.transporte.ufg.minha.minha_ufgtransporte.model.LocationTypesConverter;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.MyPlace;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.CrudMapClickListener;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.GpsInstance;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.MyPlaceDAO;
-import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -32,6 +29,7 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
     private GoogleMap mMap;
     private GpsInstance gpsInstance;
     private CrudMapClickListener crudMapClickListener;
+    private TextView textView;
 
     public CrudMapActivity(){
         this.crudMapClickListener = new CrudMapClickListener();
@@ -43,6 +41,7 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crud_map);
 
+        this.textView = findViewById(R.id.identificador);
         this.gpsInstance.checkGPSPermission();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -52,19 +51,23 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void getPoint(View view){
 
-        TextView textView = findViewById(R.id.identificador);
-
         LatLng clickPosition = this.crudMapClickListener.getClickPosition();
         MyPlaceDAO myPlaceDAO = new MyPlaceDAO(this);
 
-        String text = "";
+        String text;
         String flagKey = this.getString(R.string.flag_key);
         int flag = this.getIntent().getIntExtra(flagKey, -1);
 
         if(flag == Flag.UPDATE.valor){
 
-            MyPlace myPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
-            myPlaceDAO.updateMyPlace(myPlace.getPushKey(), myPlace);
+            MyPlace oldMyPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
+            MyPlace newMyPlace = new MyPlace(
+                    this.textView.getText().toString(),
+                    oldMyPlace.getLatitude(),
+                    oldMyPlace.getLongitude()
+            );
+
+            myPlaceDAO.updateMyPlace(oldMyPlace.getPushKey(), newMyPlace);
             text = this.getString(R.string.update_myPlace);
         } else {
 
@@ -86,28 +89,31 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         this.mMap = googleMap;
         this.mMap.setMinZoomPreference(10.0f);
 
-        LatLng goiania;
-        LatLng lastKnownLocation = LocationTypesConverter.locationToAndroidLatLng(
-                this.gpsInstance.getLastKnownLocation()
-        );
-
 
         if(this.gpsInstance.isEnable()) {
             this.mMap.setMyLocationEnabled(true);
             this.mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-            goiania = lastKnownLocation;
-        } else {
-            goiania = new LatLng(-16.665136, -49.286041);
         }
 
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+        MyPlace myPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
+
+        if(myPlace != null) {
+
+            this.textView.setText(myPlace.getIdentificador());
+
+            this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(myPlace.getLatitude(), myPlace.getLongitude()),
+                    15));
+        }
+        else {
+            LatLng goiania = new LatLng(-16.665136, -49.286041);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+        }
 
         String flagKey = this.getString(R.string.flag_key);
         int flag = this.getIntent().getIntExtra(flagKey, -1);
 
         if(flag == Flag.UPDATE.valor){
-            MyPlace myPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
             this.mMap.addMarker(
                     new MarkerOptions().position(myPlace.toLatLng())
             );
@@ -116,8 +122,6 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         this.crudMapClickListener.setGoogleMap(this.mMap);
         this.mMap.setOnMapClickListener(this.crudMapClickListener);
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

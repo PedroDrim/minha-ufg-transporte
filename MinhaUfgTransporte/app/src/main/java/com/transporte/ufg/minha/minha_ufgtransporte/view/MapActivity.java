@@ -2,12 +2,16 @@ package com.transporte.ufg.minha.minha_ufgtransporte.view;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,6 +19,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.LocationTypesConverter;
@@ -28,6 +34,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private GpsInstance gpsInstance;
+    private Location mLastKnownLocation;
+
 
     public MapActivity(){
         this.gpsInstance = new GpsInstance(this);
@@ -45,6 +53,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -54,21 +64,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         this.mMap = googleMap;
         this.mMap.setMinZoomPreference(10.0f);
 
-        LatLng goiania;
-        Location lastKnownLocation = this.gpsInstance.getLastKnownLocation();
-
         if(this.gpsInstance.isEnable()) {
             this.mMap.setMyLocationEnabled(true);
             this.mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-            goiania = LocationTypesConverter.locationToAndroidLatLng(lastKnownLocation);
-        } else {
-            goiania = new LatLng(-16.665136, -49.286041);
+        }
+        else {
+            LatLng goiania = new LatLng(-16.665136, -49.286041);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
         }
 
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+        getDeviceLocation();
 
-        this.initializePlacesAutoComplete(lastKnownLocation);
+        this.initializePlacesAutoComplete(mLastKnownLocation);
     }
 
     @Override
@@ -108,6 +115,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         autocompleteFragment.setOnPlaceSelectedListener(
                 new UfgPlaceSelectListener(this.mMap, lastKnownLocation, this)
         );
+    }
+
+    public void getDeviceLocation() {
+    /*
+     * Get the best and most recent location of the device, which may be null in rare
+     * cases when a location is not available.
+     */
+
+        FusedLocationProviderClient mFusedLocationProviderClient =
+                new FusedLocationProviderClient(this);
+
+        try {
+
+            if (this.gpsInstance.isEnable()) {
+
+                Task locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener() {
+
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            mLastKnownLocation = (Location) task.getResult();
+                            LatLng latlng = LocationTypesConverter
+                                    .locationToAndroidLatLng(mLastKnownLocation);
+
+                            mMap.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(latlng, 15));
+                        } else {
+                            LatLng goiania = new LatLng(-16.665136, -49.286041);
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
+                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        }
+
+                    }
+
+                });
+            }
+
+        } catch(SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
+        }
     }
 }
 

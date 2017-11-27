@@ -81,6 +81,15 @@ public class PlaceListActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        if(!loaded) {
+            this.loadActivityComponents();
+            this.loaded = true;
+        }
+    }
+
     /**
      * Evento que sera realizado quando um Set de locais for Inscrito
      * @param setMyPlace Set dos locais obtidos do banco de dados
