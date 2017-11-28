@@ -1,6 +1,8 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.view;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -52,34 +54,36 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
     public void getPoint(View view){
 
         LatLng clickPosition = this.crudMapClickListener.getClickPosition();
-        MyPlaceDAO myPlaceDAO = new MyPlaceDAO(this);
 
-        String text;
-        String flagKey = this.getString(R.string.flag_key);
-        int flag = this.getIntent().getIntExtra(flagKey, -1);
+        if(clickPosition != null) {
+            MyPlaceDAO myPlaceDAO = new MyPlaceDAO(this);
 
-        if(flag == Flag.UPDATE.valor){
+            String text;
+            String flagKey = this.getString(R.string.flag_key);
+            int flag = this.getIntent().getIntExtra(flagKey, -1);
 
-            MyPlace oldMyPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
-            MyPlace newMyPlace = new MyPlace(
-                    this.textView.getText().toString(),
-                    clickPosition.latitude,
-                    clickPosition.longitude
-            );
+            if (flag == Flag.UPDATE.valor) {
 
-            myPlaceDAO.updateMyPlace(oldMyPlace.getPushKey(), newMyPlace);
-            text = this.getString(R.string.update_myPlace);
-        } else {
+                MyPlace oldMyPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
+                MyPlace newMyPlace = new MyPlace(
+                        this.textView.getText().toString(),
+                        clickPosition.latitude,
+                        clickPosition.longitude
+                );
 
-            myPlaceDAO.createMyPlace(
-                    new MyPlace(textView.getText().toString(),
-                            clickPosition.latitude, clickPosition.longitude)
-            );
-            text = this.getString(R.string.insert_myPlace);
+                myPlaceDAO.updateMyPlace(oldMyPlace.getPushKey(), newMyPlace);
+                text = this.getString(R.string.update_myPlace);
+            } else {
+
+                myPlaceDAO.createMyPlace(
+                        new MyPlace(textView.getText().toString(),
+                                clickPosition.latitude, clickPosition.longitude)
+                );
+                text = this.getString(R.string.insert_myPlace);
+            }
+
+            Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
         }
-
-        Toast.makeText( CrudMapActivity.this, text, Toast.LENGTH_SHORT ).show();
-
 
         this.finish();
     }
@@ -100,14 +104,15 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         MyPlace myPlace = EventBus.getDefault().getStickyEvent(MyPlace.class);
 
         if(myPlace != null) {
-
             this.textView.setText(myPlace.getIdentificador());
 
             this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(myPlace.getLatitude(), myPlace.getLongitude()),
                     15));
+
         }
         else {
+
             LatLng goiania = new LatLng(-16.665136, -49.286041);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(goiania, 15));
         }

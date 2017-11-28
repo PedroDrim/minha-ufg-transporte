@@ -1,5 +1,6 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.presenter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -25,16 +26,6 @@ public class OpenActivity {
         String flagKey = context.getString(R.string.flag_key);
         Intent intent = new Intent( context, CrudMapActivity.class );
         intent.putExtra(flagKey, flag.valor);
-        context.startActivity(intent);
-    }
-
-    /**
-     * Abre a MapActivity
-     * @param context contexto da aplicacao
-     * @see MapActivity
-     */
-    public static void openMapActivity(Context context){
-        Intent intent = new Intent( context, MapActivity.class );
         context.startActivity(intent);
     }
 
