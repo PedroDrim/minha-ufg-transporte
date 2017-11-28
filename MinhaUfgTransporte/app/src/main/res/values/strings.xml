@@ -14,4 +14,5 @@
     <string name="login_fill_input">Preencha os campos de e-mail e senha!</string>
     <string name="insert_myPlace">Local adicionado com sucesso.</string>
     <string name="update_myPlace">Local atualizado com sucesso.</string>
+    <string name="none_myPlace">Não houve alterações nos locais.</string>
 </resources>

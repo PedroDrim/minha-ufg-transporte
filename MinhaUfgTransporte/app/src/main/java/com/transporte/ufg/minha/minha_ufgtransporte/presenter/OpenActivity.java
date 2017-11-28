@@ -1,13 +1,11 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.presenter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.CrudMapActivity;
-import com.transporte.ufg.minha.minha_ufgtransporte.view.LoginActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.PlaceListActivity;
 
@@ -39,8 +37,8 @@ public class OpenActivity {
         context.startActivity(intent);
     }
 
-    public static void openLoginActivity(Context context){
-        Intent intent = new Intent( context, LoginActivity.class );
+    public static void openMapsActivity(Context context){
+        Intent intent = new Intent( context, MapActivity.class );
         context.startActivity(intent);
     }
 

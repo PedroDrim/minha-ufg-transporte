@@ -100,14 +100,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         switch (item.getItemId()) {
             case R.id.crud_locais:
-
-                FirebaseUser user = FirebaseConfiguration.getFirebaseAuth().getCurrentUser();
-
-                if(user == null) {
-                    OpenActivity.openLoginActivity(this);
-                } else {
-                    OpenActivity.openPlaceListActivity(this);
-                }
+                OpenActivity.openPlaceListActivity(this);
                 return (true);
         }
 
