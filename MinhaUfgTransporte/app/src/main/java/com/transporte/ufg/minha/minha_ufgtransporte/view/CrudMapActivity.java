@@ -58,28 +58,72 @@ public class CrudMapActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
     }
 
-    public void getPoint(View view){
+    public void getPoint(View view) {
 
-        String text;
         LatLng clickPosition = this.crudMapClickListener.getClickPosition();
 
-        if(clickPosition != null) {
+        if (this.flag == Flag.UPDATE.valor) {
+            this.verifyAndUpdate(clickPosition);
+        } else {
+            this.verifyAndCreate(clickPosition);
+        }
+    }
 
-            if (this.flag == Flag.UPDATE.valor) {
-                this.updateMyPlace(clickPosition);
-                text = this.getString(R.string.update_myPlace);
-            } else {
-                this.createMyPlace(clickPosition);
-                text = this.getString(R.string.insert_myPlace);
+    private void verifyAndCreate(LatLng clickPosition){
+
+        String text;
+
+        if(this.validateNewInput(clickPosition)){
+
+            this.createMyPlace(clickPosition);
+            text = this.getString(R.string.insert_myPlace);
+            Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
+            this.finish();
+        } else {
+
+            text = this.getString(R.string.none_insert_myPlace);
+            Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void verifyAndUpdate(LatLng clickPosition){
+
+        String text;
+
+        if(this.validateUpdateInput()) {
+
+            if(clickPosition == null){
+                double latitude = this.myPlace.getLatitude();
+                double longitude = this.myPlace.getLongitude();
+                clickPosition = new LatLng(latitude, longitude);
             }
 
-        } else {
-            text = this.getString(R.string.none_myPlace);
-        }
+            this.updateMyPlace(clickPosition);
+            text = this.getString(R.string.update_myPlace);
+            Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
+            this.finish();
+        }else{
 
-        Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
-        this.finish();
+            text = this.getString(R.string.none_update_myPlace);
+            Toast.makeText(CrudMapActivity.this, text, Toast.LENGTH_SHORT).show();
+        }
     }
+
+
+    private boolean validateNewInput(LatLng clickPosition){
+        String title = this.textView.getText().toString();
+        boolean TitleNull = title.equals("");
+        boolean positionNull = clickPosition == null;
+
+        return !(positionNull || TitleNull);
+    }
+
+    private boolean validateUpdateInput(){
+        String title = this.textView.getText().toString();
+        boolean TitleNull = title.equals("");
+        return !TitleNull;
+    }
+
 
     private void updateMyPlace(LatLng position){
         MyPlace newMyPlace = new MyPlace( this.textView.getText().toString(), position );
