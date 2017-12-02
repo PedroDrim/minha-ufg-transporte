@@ -38,4 +38,62 @@
         android:layout_height="match_parent"
         tools:context="com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity" />
 
+    <!-- A CardView that contains a TextView -->
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/route_information"
+        android:layout_gravity="start"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        card_view:cardCornerRadius="4dp"
+        android:layout_alignBottom="@id/map"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <View
+                android:id="@+id/route_color"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/bus_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Onibus: "
+                android:drawableStart="@drawable/ic_directions_bus_24dp"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/travel_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tempo total de viagem:"
+                android:drawableStart="@drawable/ic_access_time_black_24dp"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/instructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_navigation_24dp"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"/>
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
 </RelativeLayout>

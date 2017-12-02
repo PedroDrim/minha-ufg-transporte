@@ -3,7 +3,9 @@ package com.transporte.ufg.minha.minha_ufgtransporte.service;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
@@ -20,12 +22,15 @@ import com.google.maps.android.PolyUtil;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.LocationTypesConverter;
 
 import org.joda.time.DateTime;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -81,7 +86,23 @@ public class UfgPlaceSelectListener implements PlaceSelectionListener {
                     .departureTime(now)
                     .alternatives(true)
                     .transitMode(TransitMode.BUS)
+                    .language("pt-BR")
                     .await();
+
+            int stepsNumber = result.routes[1].legs[0].steps.length;
+            DirectionsRoute[] routes = result.routes;
+            DirectionsLeg[] legs = routes[1].legs;
+            DirectionsStep[] steps = legs[0].steps;
+
+
+            for(int i = 0; i < stepsNumber; i++) {
+                Log.i("==== Step", steps[i].htmlInstructions);
+                Log.i("==== Step", steps[i].distance.humanReadable);
+                if (steps[i].transitDetails != null) {
+
+                    Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
+                }
+            }
 
             addMarkersToMap(result);
             addPolyline(result);
