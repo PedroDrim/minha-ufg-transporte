@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -39,6 +40,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private GpsInstance gpsInstance;
+    CardView cardView;
+    TextView busLineView;
+    TextView travelTimeView;
 
     public MapActivity(){
         this.gpsInstance = new GpsInstance(this);
@@ -48,9 +52,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         setContentView(R.layout.activity_map);
+
+        cardView = findViewById(R.id.route_information);
+        cardView.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,6 +65,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        busLineView = findViewById(R.id.bus_line);
+        travelTimeView = findViewById(R.id.travel_time);
 
     }
 
@@ -124,7 +132,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         autocompleteFragment.setBoundsBias(new LatLngBounds(start, end));
         autocompleteFragment.setOnPlaceSelectedListener(
-                new UfgPlaceSelectListener(this.mMap, lastKnownLocation, this)
+                new UfgPlaceSelectListener(this.mMap, lastKnownLocation, this, this)
         );
     }
 
@@ -155,6 +163,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             LatLng latlng = LocationTypesConverter
                                     .locationToAndroidLatLng(mLastKnownLocation);
 
+                            Log.i("-->User location lat", String.valueOf(latlng.latitude));
+                            Log.i("-->User location lng", String.valueOf(latlng.longitude));
+
                             mMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(latlng, 15));
                         } else {
@@ -171,6 +182,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         } catch(SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    public void makeCardVisible (String busLine, String travelTime) {
+        busLineView.setText(busLine);
+        travelTimeView.setText(travelTime);
+        //instructionsView.setText(instructions);
+        cardView.setVisibility(View.VISIBLE);
     }
 }
 

@@ -44,7 +44,7 @@
         android:id="@+id/route_information"
         android:layout_gravity="start"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="10dp"
@@ -58,13 +58,6 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <View
-                android:id="@+id/route_color"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="5dp"/>
-
             <TextView
                 android:id="@+id/bus_line"
                 android:layout_width="match_parent"
@@ -72,6 +65,7 @@
                 android:text="Onibus: "
                 android:drawableStart="@drawable/ic_directions_bus_24dp"
                 android:drawablePadding="10dp"
+                android:paddingBottom="10dp"
                 android:gravity="center_vertical"/>
 
             <TextView
@@ -80,14 +74,6 @@
                 android:layout_height="wrap_content"
                 android:text="Tempo total de viagem:"
                 android:drawableStart="@drawable/ic_access_time_black_24dp"
-                android:drawablePadding="10dp"
-                android:gravity="center_vertical"/>
-
-            <TextView
-                android:id="@+id/instructions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_navigation_24dp"
                 android:drawablePadding="10dp"
                 android:gravity="center_vertical"/>
 
