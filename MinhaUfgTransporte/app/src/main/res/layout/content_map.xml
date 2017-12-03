@@ -54,30 +54,48 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/bus_line"
+            <View
+                android:id="@+id/route_color"
+                android:layout_width="8dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/colorPrimaryDark"/>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Onibus: "
-                android:drawableStart="@drawable/ic_directions_bus_24dp"
-                android:drawablePadding="10dp"
-                android:paddingBottom="10dp"
-                android:gravity="center_vertical"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-            <TextView
-                android:id="@+id/travel_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tempo total de viagem:"
-                android:drawableStart="@drawable/ic_access_time_black_24dp"
-                android:drawablePadding="10dp"
-                android:gravity="center_vertical"/>
+                <TextView
+                    android:id="@+id/bus_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Onibus: "
+                    android:drawableStart="@drawable/ic_directions_bus_24dp"
+                    android:drawablePadding="10dp"
+                    android:paddingBottom="10dp"
+                    android:gravity="center_vertical"/>
 
+                <TextView
+                    android:id="@+id/travel_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tempo total de viagem:"
+                    android:drawableStart="@drawable/ic_access_time_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:gravity="center_vertical"/>
+
+            </LinearLayout>
         </LinearLayout>
+
+
 
 
     </android.support.v7.widget.CardView>

@@ -1,6 +1,7 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.view;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -50,12 +51,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTitle("Minha-UFG Transporte");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_map);
-
-        cardView = findViewById(R.id.route_information);
-        cardView.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -68,6 +67,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         busLineView = findViewById(R.id.bus_line);
         travelTimeView = findViewById(R.id.travel_time);
+        cardView = findViewById(R.id.route_information);
+        cardView.setVisibility(View.GONE);
 
     }
 
@@ -185,9 +186,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void makeCardVisible (String busLine, String travelTime) {
+        String colors[] = this.getResources().getStringArray(R.array.colors);
+        View routeColor = findViewById(R.id.route_color);
         busLineView.setText(busLine);
         travelTimeView.setText(travelTime);
-        //instructionsView.setText(instructions);
+        routeColor.setBackgroundColor(Color.parseColor(colors[0]));
         cardView.setVisibility(View.VISIBLE);
     }
 }

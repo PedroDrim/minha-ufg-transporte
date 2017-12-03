@@ -104,13 +104,13 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
             String travelTime = result.routes[0].legs[0].duration.toString();
             String busLine = "";
             DirectionsRoute[] routes = result.routes;
-            DirectionsLeg[] legs = routes[1].legs;
+            DirectionsLeg[] legs = routes[0].legs;
             DirectionsStep[] steps = legs[0].steps;
 
 
             for(int i = 0; i < stepsNumber; i++) {
-                // Log.i("==== Step", steps[i].htmlInstructions);
-                //Log.i("==== Step", steps[i].distance.humanReadable);
+                Log.i("==== Step", steps[i].htmlInstructions);
+                Log.i("==== Step", steps[i].distance.humanReadable);
                 if (steps[i].transitDetails != null) {
                     Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
                     busLine = steps[i].transitDetails.line.shortName;
