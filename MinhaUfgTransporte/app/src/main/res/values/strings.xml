@@ -14,4 +14,7 @@
     <string name="login_fill_input">Preencha os campos de e-mail e senha!</string>
     <string name="insert_myPlace">Local adicionado com sucesso.</string>
     <string name="update_myPlace">Local atualizado com sucesso.</string>
+    <string name="none_insert_myPlace">Insira um identificador ou uma posição no mapa.</string>
+    <string name="none_update_myPlace">Insira um identificador.</string>
+    <string name="fastest_route">Rota mais rápida</string>
 </resources>

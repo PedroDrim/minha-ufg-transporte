@@ -32,7 +32,7 @@ public class AuthListener implements OnCompleteListener<AuthResult>{
     public void onComplete(@NonNull Task<AuthResult> task) {
 
         if (task.isSuccessful()){
-            OpenActivity.openPlaceListActivity(this.context);
+            OpenActivity.openMapsActivity(this.context);
         }else {
             String text = context.getString(R.string.invalid_login);
             Toast.makeText( this.context, text, Toast.LENGTH_SHORT ).show();

@@ -1,15 +1,22 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.view;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -31,12 +38,18 @@ import com.transporte.ufg.minha.minha_ufgtransporte.service.UfgPlaceSelectListen
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private GpsInstance gpsInstance;
+    CardView cardView;
+    TextView busLineView;
+    TextView travelTimeView;
+    LayoutInflater inflater;
+    public LinearLayout routeDetailsView;
 
     public MapActivity(){
         this.gpsInstance = new GpsInstance(this);
@@ -44,8 +57,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTitle("Minha-UFG Transporte");
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_map);
+
+        inflater = LayoutInflater.from(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -54,6 +71,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        routeDetailsView = findViewById(R.id.route_details);
+
+        busLineView = findViewById(R.id.bus_line);
+        travelTimeView = findViewById(R.id.travel_time);
+        cardView = findViewById(R.id.route_information);
+        cardView.setVisibility(View.GONE);
 
     }
 
@@ -100,14 +124,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         switch (item.getItemId()) {
             case R.id.crud_locais:
-
-                FirebaseUser user = FirebaseConfiguration.getFirebaseAuth().getCurrentUser();
-
-                if(user == null) {
-                    OpenActivity.openLoginActivity(this);
-                } else {
-                    OpenActivity.openPlaceListActivity(this);
-                }
+                OpenActivity.openPlaceListActivity(this);
                 return (true);
         }
 
@@ -125,7 +142,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         autocompleteFragment.setBoundsBias(new LatLngBounds(start, end));
         autocompleteFragment.setOnPlaceSelectedListener(
-                new UfgPlaceSelectListener(this.mMap, lastKnownLocation, this)
+                new UfgPlaceSelectListener(this.mMap, lastKnownLocation, this, this)
         );
     }
 
@@ -156,6 +173,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             LatLng latlng = LocationTypesConverter
                                     .locationToAndroidLatLng(mLastKnownLocation);
 
+                            Log.i("-->User location lat", String.valueOf(latlng.latitude));
+                            Log.i("-->User location lng", String.valueOf(latlng.longitude));
+
                             mMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(latlng, 15));
                         } else {
@@ -172,6 +192,44 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         } catch(SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    public void makeCardVisible (String travelTime) {
+
+//        addWalkDetail(firstWalk);
+//
+//        addArrow();
+//
+//        addBusDetail(busLine);
+//
+//        addArrow();
+//
+//        addWalkDetail(secondWalk);
+
+        travelTimeView.setText(travelTime);
+
+        cardView.setVisibility(View.VISIBLE);
+    }
+
+    public void addBusDetail(String busLine, int busCounter) {
+        View busDetail = inflater.inflate(R.layout.bus_content, null, false);
+        if (busCounter < 3) {
+            TextView busLineView = busDetail.findViewById(R.id.bus_line);
+            busLineView.setText(busLine);
+        }
+        routeDetailsView.addView(busDetail);
+    }
+
+    public void addWalkDetail(String walkMin) {
+        View walkDetail = inflater.inflate(R.layout.walk_content, null, false);
+        TextView walkMinView = walkDetail.findViewById(R.id.walk_min);
+        walkMinView.setText(walkMin);
+        routeDetailsView.addView(walkDetail);
+    }
+
+    public void addArrow() {
+        View arrow = inflater.inflate(R.layout.arrow_right, null, false);
+        routeDetailsView.addView(arrow);
     }
 }
 

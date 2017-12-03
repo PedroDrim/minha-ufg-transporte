@@ -60,6 +60,10 @@ public class MyPlaceAdapter extends RecyclerView.Adapter<MyPlaceHolder> {
         notifyItemRemoved(index);
     }
 
+    public String getPushKey(MyPlace myPlace) {
+        int index = this.myPlaceList.indexOf(myPlace);
+        return this.myPlaceList.get(index).getPushKey();
+    }
     /**
      * Limpa a lista de locais do LinearLayout
      */

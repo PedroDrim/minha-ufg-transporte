@@ -47,6 +47,17 @@ public class MyPlace {
     }
 
     /**
+     * Construtor para a inicializacao de um novo local
+     * @param identificador identificador do novo local
+     * @param latlng latitude e longitude do novo local
+     */
+    public MyPlace(String identificador, LatLng latlng) {
+        this.identificador = identificador;
+        this.latitude = latlng.latitude;
+        this.longitude = latlng.longitude;
+    }
+
+    /**
      * Obtem o identificador do local
      * @return identificador do local
      */

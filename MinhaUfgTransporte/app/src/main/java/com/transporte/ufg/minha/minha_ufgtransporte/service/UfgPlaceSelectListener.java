@@ -1,9 +1,15 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
@@ -12,6 +18,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
@@ -20,12 +28,16 @@ import com.google.maps.android.PolyUtil;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.LocationTypesConverter;
+import com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity;
 
 import org.joda.time.DateTime;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,26 +47,29 @@ import java.util.concurrent.TimeUnit;
  * Created by pedro on 25/11/17.
  */
 
-public class UfgPlaceSelectListener implements PlaceSelectionListener {
+public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSelectionListener {
 
     private GoogleMap mMap;
     private Context context;
     private Location lastKnownLocation;
+    private MapActivity mapActivity;
 
-    public UfgPlaceSelectListener(GoogleMap mMap, Location lastKnownLocation, Context context) {
+    public UfgPlaceSelectListener(GoogleMap mMap, Location lastKnownLocation, Context context, MapActivity mapActivity) {
         this.mMap = mMap;
         this.context = context;
         this.lastKnownLocation = lastKnownLocation;
+        this.mapActivity = mapActivity;
     }
 
     @Override
     public void onPlaceSelected(Place place) {
         LatLng destination = place.getLatLng();
-        this.mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(destination, 10),
-                2000,
-                null
-        );
+
+        Log.i("-->User dest lat", String.valueOf(destination.latitude));
+        Log.i("-->User dest lng", String.valueOf(destination.longitude));
+
+
+
 
         this.requestRoutes(destination);
     }
@@ -81,8 +96,10 @@ public class UfgPlaceSelectListener implements PlaceSelectionListener {
                     .departureTime(now)
                     .alternatives(true)
                     .transitMode(TransitMode.BUS)
+                    .language("pt-BR")
                     .await();
 
+            showTravelDetails(result);
             addMarkersToMap(result);
             addPolyline(result);
 
@@ -95,6 +112,63 @@ public class UfgPlaceSelectListener implements PlaceSelectionListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showTravelDetails(DirectionsResult result) {
+        mapActivity.routeDetailsView.removeAllViews();
+
+        int routesNumber = result.routes.length;
+        long lowerDuration = Long.MAX_VALUE;
+        int fastestRoute = 0;
+
+        for(int n = 0; n < routesNumber; n++){
+            if(result.routes[n].legs[0].duration.inSeconds < lowerDuration){
+                lowerDuration = result.routes[n].legs[0].duration.inSeconds;
+                fastestRoute = n;
+                Log.e("==== FASTEST ROUTE", String.valueOf(fastestRoute) );
+            }
+        }
+
+        DirectionsStep[] steps = result.routes[fastestRoute].legs[0].steps;
+        int stepsNumber = result.routes[fastestRoute].legs[0].steps.length;
+        int busCounter = 0;
+        boolean addArrow = true;
+        for(int i = 0; i < stepsNumber; i++) {
+            addArrow = true;
+            Log.i("==== Step", steps[i].htmlInstructions);
+            Log.i("==== Step", steps[i].distance.humanReadable);
+            Log.e("TRAVEL-MODE",  steps[i].travelMode.toString());
+
+            if (steps[i].travelMode.toString().equals("walking")){
+                int walkingDuration = (int) steps[i].duration.inSeconds/60;
+                if (walkingDuration > 1) {
+                    String walkMin = String.valueOf(steps[i].duration.inSeconds/60);
+                    mapActivity.addWalkDetail(walkMin);
+
+                } else addArrow = false;
+            }
+            if (steps[i].transitDetails != null) {
+                busCounter++;
+                Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
+                String busLine = steps[i].transitDetails.line.shortName;
+                mapActivity.addBusDetail(busLine, busCounter);
+            }
+
+            if(i < stepsNumber - 1 && shouldAddArrow(steps[i+1]) && addArrow){
+                mapActivity.addArrow();
+            }
+        }
+
+        String travelTime = result.routes[fastestRoute].legs[0].duration.toString();
+        mapActivity.makeCardVisible(travelTime);
+    }
+
+    private boolean shouldAddArrow (DirectionsStep nextStep) {
+        if (nextStep.travelMode.toString().equals("walking")) {
+            int walkingDuration = (int) nextStep.duration.inSeconds / 60;
+            return walkingDuration > 1;
+        }
+        return true;
     }
 
     private GeoApiContext getGeoContext() {
@@ -117,24 +191,40 @@ public class UfgPlaceSelectListener implements PlaceSelectionListener {
     }
 
     private void addMarkersToMap(DirectionsResult results) {
+        mMap.clear();
         int routesNum = results.routes.length;
+        Marker origin = null;
+        Marker destination = null;
 
         for(int i = 0; i < routesNum; i++) {
             DirectionsLeg leg = results.routes[i].legs[0];
 
-            this.mMap.addMarker(
+            origin = this.mMap.addMarker(
                     new MarkerOptions()
                             .position(LocationTypesConverter.MapsLatLngToAndroidLatLng(leg.startLocation))
                             .title(leg.startAddress)
             );
 
-            this.mMap.addMarker(
+            destination = this.mMap.addMarker(
                     new MarkerOptions()
                             .position(LocationTypesConverter.MapsLatLngToAndroidLatLng(leg.endLocation))
                             .title(leg.startAddress)
                             .snippet(getEndLocationTitle(leg))
             );
         }
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(origin.getPosition());
+        builder.include(destination.getPosition());
+
+
+        LatLngBounds bounds = builder.build();
+
+        this.mMap.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(bounds, 280),
+                2000,
+                null
+        );
     }
 
     private void addPolyline(DirectionsResult results) {

@@ -1,5 +1,7 @@
 package com.transporte.ufg.minha.minha_ufgtransporte.view;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.MyPlace;
+import com.transporte.ufg.minha.minha_ufgtransporte.presenter.MyPlaceDAO;
 import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.component.MyPlaceAdapter;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.component.MyPlaceRefreshListener;
@@ -52,6 +55,8 @@ public class PlaceListActivity extends AppCompatActivity {
      */
     private MyPlaceAdapter mAdapter;
 
+    private MyPlaceDAO myPlaceDAO;
+
     /**
      * Construtor que inicializa a flag de gerenciamento
      */
@@ -64,10 +69,10 @@ public class PlaceListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_list);
 
-        //if(!loaded) {
+        if(!loaded) {
             this.loadActivityComponents();
             this.loaded = true;
-        //}
+        }
     }
 
     @Override
@@ -86,10 +91,7 @@ public class PlaceListActivity extends AppCompatActivity {
     @Override
     public void onRestart(){
         super.onRestart();
-        if(!loaded) {
-            this.loadActivityComponents();
-            this.loaded = true;
-        }
+        this.loadActivityComponents();
     }
 
     /**
@@ -112,7 +114,8 @@ public class PlaceListActivity extends AppCompatActivity {
 
     public void removeMyPlace(View view){
         RelativeLayout layout = (RelativeLayout) view.getParent();
-        MyPlace myPlace = getMyPlaceByView(layout);
+        MyPlace myPlace = this.getMyPlaceByView(layout);
+        this.myPlaceDAO.removeMyPlace(myPlace.getPushKey());
         this.mAdapter.deleteItem(myPlace);
     }
 
@@ -140,7 +143,12 @@ public class PlaceListActivity extends AppCompatActivity {
         double latitude = Double.valueOf(textLatitude);
         double longitude = Double.valueOf(textLongitude);
 
-        return( new MyPlace(identificador, latitude, longitude));
+        MyPlace myPlace = new MyPlace(identificador, latitude, longitude);
+
+        String pushKey = this.mAdapter.getPushKey(myPlace);
+        myPlace.setPushKey(pushKey);
+
+        return(myPlace);
     }
 
     /**
@@ -148,6 +156,7 @@ public class PlaceListActivity extends AppCompatActivity {
      */
     private void loadActivityComponents(){
 
+        this.myPlaceDAO = new MyPlaceDAO(this);
         this.myPlaceRefreshListener = new MyPlaceRefreshListener(this);
 
         this.swipeRefreshLayout = findViewById(R.id.swipe_refresh);

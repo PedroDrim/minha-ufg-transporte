@@ -6,7 +6,6 @@ import android.content.Intent;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
 import com.transporte.ufg.minha.minha_ufgtransporte.model.Flag;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.CrudMapActivity;
-import com.transporte.ufg.minha.minha_ufgtransporte.view.LoginActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.MapActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.view.PlaceListActivity;
 
@@ -29,16 +28,6 @@ public class OpenActivity {
     }
 
     /**
-     * Abre a MapActivity
-     * @param context contexto da aplicacao
-     * @see MapActivity
-     */
-    public static void openMapActivity(Context context){
-        Intent intent = new Intent( context, MapActivity.class );
-        context.startActivity(intent);
-    }
-
-    /**
      * Abre a PlaceListActivity
      * @param context contexto da aplicacao
      * @see com.transporte.ufg.minha.minha_ufgtransporte.view.PlaceListActivity
@@ -48,8 +37,8 @@ public class OpenActivity {
         context.startActivity(intent);
     }
 
-    public static void openLoginActivity(Context context){
-        Intent intent = new Intent( context, LoginActivity.class );
+    public static void openMapsActivity(Context context){
+        Intent intent = new Intent( context, MapActivity.class );
         context.startActivity(intent);
     }
 

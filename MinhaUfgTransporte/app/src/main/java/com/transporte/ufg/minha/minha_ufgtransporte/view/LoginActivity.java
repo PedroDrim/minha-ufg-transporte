@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.transporte.ufg.minha.minha_ufgtransporte.R;
+import com.transporte.ufg.minha.minha_ufgtransporte.presenter.OpenActivity;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.AuthListener;
 import com.transporte.ufg.minha.minha_ufgtransporte.service.FirebaseConfiguration;
 
@@ -25,6 +26,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        OpenActivity.openMapsActivity(this);
     }
 
     /**
