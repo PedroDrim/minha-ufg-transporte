@@ -35,6 +35,7 @@ import com.transporte.ufg.minha.minha_ufgtransporte.service.UfgPlaceSelectListen
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -185,9 +186,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void makeCardVisible (String busLine, String travelTime) {
+    public void makeCardVisible (String firstWalk, String busLine, String secondWalk, String travelTime) {
         String colors[] = this.getResources().getStringArray(R.array.colors);
         View routeColor = findViewById(R.id.route_color);
+        TextView firstWalkText = findViewById(R.id.first_walk_min);
+        TextView secondWalkText = findViewById(R.id.second_walk_min);
+        firstWalkText.setText(firstWalk);
+        secondWalkText.setText(secondWalk);
         busLineView.setText(busLine);
         travelTimeView.setText(travelTime);
         routeColor.setBackgroundColor(Color.parseColor(colors[0]));

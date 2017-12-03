@@ -73,15 +73,25 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
-                    android:id="@+id/bus_line"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Onibus: "
-                    android:drawableStart="@drawable/ic_directions_bus_24dp"
-                    android:drawablePadding="10dp"
-                    android:paddingBottom="10dp"
-                    android:gravity="center_vertical"/>
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_vertical">
+
+                    <include layout="@layout/walk_content"/>
+
+                    <include layout="@layout/arrow_right"/>
+
+                    <include layout="@layout/bus_content"/>
+
+                    <include layout="@layout/arrow_right"/>
+
+                    <include layout="@layout/walk_content"/>
+
+                </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/travel_time"

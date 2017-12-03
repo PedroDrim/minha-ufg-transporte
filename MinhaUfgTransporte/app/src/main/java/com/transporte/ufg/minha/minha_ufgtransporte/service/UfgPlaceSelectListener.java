@@ -102,7 +102,10 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
 
             int stepsNumber = result.routes[0].legs[0].steps.length;
             String travelTime = result.routes[0].legs[0].duration.toString();
+            String firstWalk = "0";
+            String secondWalk = "0";
             String busLine = "";
+            int bus_step = 0;
             DirectionsRoute[] routes = result.routes;
             DirectionsLeg[] legs = routes[0].legs;
             DirectionsStep[] steps = legs[0].steps;
@@ -111,13 +114,23 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
             for(int i = 0; i < stepsNumber; i++) {
                 Log.i("==== Step", steps[i].htmlInstructions);
                 Log.i("==== Step", steps[i].distance.humanReadable);
+                Log.e("TRAVEL-MODE",  steps[i].travelMode.toString());
+                if (steps[i].travelMode.toString().equals("walking") && firstWalk == "0"){
+                    firstWalk = steps[i].duration.humanReadable;
+                    Log.e("-- WALK TIME", steps[i].duration.humanReadable);
+                }
                 if (steps[i].transitDetails != null) {
                     Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
                     busLine = steps[i].transitDetails.line.shortName;
+                    bus_step = i;
+                }
+                if (steps[i].travelMode.toString().equals("walking") && i > bus_step) {
+                    secondWalk = steps[i].duration.humanReadable;
+                    Log.e("-- WALK TIME 2", steps[i].duration.humanReadable);
                 }
             }
 
-            mapActivity.makeCardVisible(busLine, travelTime);
+            mapActivity.makeCardVisible(firstWalk,busLine, secondWalk, travelTime);
 
             addMarkersToMap(result);
             addPolyline(result);
