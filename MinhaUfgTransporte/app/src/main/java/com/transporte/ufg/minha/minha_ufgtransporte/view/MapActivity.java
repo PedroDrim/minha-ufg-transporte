@@ -10,9 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,6 +48,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     CardView cardView;
     TextView busLineView;
     TextView travelTimeView;
+    LayoutInflater inflater;
+    public LinearLayout routeDetailsView;
 
     public MapActivity(){
         this.gpsInstance = new GpsInstance(this);
@@ -57,6 +62,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         setContentView(R.layout.activity_map);
 
+        inflater = LayoutInflater.from(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,6 +71,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        routeDetailsView = findViewById(R.id.route_details);
 
         busLineView = findViewById(R.id.bus_line);
         travelTimeView = findViewById(R.id.travel_time);
@@ -186,17 +194,42 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void makeCardVisible (String firstWalk, String busLine, String secondWalk, String travelTime) {
-        String colors[] = this.getResources().getStringArray(R.array.colors);
-        View routeColor = findViewById(R.id.route_color);
-        TextView firstWalkText = findViewById(R.id.first_walk_min);
-        TextView secondWalkText = findViewById(R.id.second_walk_min);
-        firstWalkText.setText(firstWalk);
-        secondWalkText.setText(secondWalk);
-        busLineView.setText(busLine);
+    public void makeCardVisible (String travelTime) {
+
+//        addWalkDetail(firstWalk);
+//
+//        addArrow();
+//
+//        addBusDetail(busLine);
+//
+//        addArrow();
+//
+//        addWalkDetail(secondWalk);
+
         travelTimeView.setText(travelTime);
-        routeColor.setBackgroundColor(Color.parseColor(colors[0]));
+
         cardView.setVisibility(View.VISIBLE);
+    }
+
+    public void addBusDetail(String busLine, int busCounter) {
+        View busDetail = inflater.inflate(R.layout.bus_content, null, false);
+        if (busCounter < 3) {
+            TextView busLineView = busDetail.findViewById(R.id.bus_line);
+            busLineView.setText(busLine);
+        }
+        routeDetailsView.addView(busDetail);
+    }
+
+    public void addWalkDetail(String walkMin) {
+        View walkDetail = inflater.inflate(R.layout.walk_content, null, false);
+        TextView walkMinView = walkDetail.findViewById(R.id.walk_min);
+        walkMinView.setText(walkMin);
+        routeDetailsView.addView(walkDetail);
+    }
+
+    public void addArrow() {
+        View arrow = inflater.inflate(R.layout.arrow_right, null, false);
+        routeDetailsView.addView(arrow);
     }
 }
 

@@ -99,39 +99,7 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
                     .language("pt-BR")
                     .await();
 
-
-            int stepsNumber = result.routes[0].legs[0].steps.length;
-            String travelTime = result.routes[0].legs[0].duration.toString();
-            String firstWalk = "0";
-            String secondWalk = "0";
-            String busLine = "";
-            int bus_step = 0;
-            DirectionsRoute[] routes = result.routes;
-            DirectionsLeg[] legs = routes[0].legs;
-            DirectionsStep[] steps = legs[0].steps;
-
-
-            for(int i = 0; i < stepsNumber; i++) {
-                Log.i("==== Step", steps[i].htmlInstructions);
-                Log.i("==== Step", steps[i].distance.humanReadable);
-                Log.e("TRAVEL-MODE",  steps[i].travelMode.toString());
-                if (steps[i].travelMode.toString().equals("walking") && firstWalk == "0"){
-                    firstWalk = steps[i].duration.humanReadable;
-                    Log.e("-- WALK TIME", steps[i].duration.humanReadable);
-                }
-                if (steps[i].transitDetails != null) {
-                    Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
-                    busLine = steps[i].transitDetails.line.shortName;
-                    bus_step = i;
-                }
-                if (steps[i].travelMode.toString().equals("walking") && i > bus_step) {
-                    secondWalk = steps[i].duration.humanReadable;
-                    Log.e("-- WALK TIME 2", steps[i].duration.humanReadable);
-                }
-            }
-
-            mapActivity.makeCardVisible(firstWalk,busLine, secondWalk, travelTime);
-
+            showTravelDetails(result);
             addMarkersToMap(result);
             addPolyline(result);
 
@@ -144,6 +112,63 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showTravelDetails(DirectionsResult result) {
+        mapActivity.routeDetailsView.removeAllViews();
+
+        int routesNumber = result.routes.length;
+        long lowerDuration = Long.MAX_VALUE;
+        int fastestRoute = 0;
+
+        for(int n = 0; n < routesNumber; n++){
+            if(result.routes[n].legs[0].duration.inSeconds < lowerDuration){
+                lowerDuration = result.routes[n].legs[0].duration.inSeconds;
+                fastestRoute = n;
+                Log.e("==== FASTEST ROUTE", String.valueOf(fastestRoute) );
+            }
+        }
+
+        DirectionsStep[] steps = result.routes[fastestRoute].legs[0].steps;
+        int stepsNumber = result.routes[fastestRoute].legs[0].steps.length;
+        int busCounter = 0;
+        boolean addArrow = true;
+        for(int i = 0; i < stepsNumber; i++) {
+            addArrow = true;
+            Log.i("==== Step", steps[i].htmlInstructions);
+            Log.i("==== Step", steps[i].distance.humanReadable);
+            Log.e("TRAVEL-MODE",  steps[i].travelMode.toString());
+
+            if (steps[i].travelMode.toString().equals("walking")){
+                int walkingDuration = (int) steps[i].duration.inSeconds/60;
+                if (walkingDuration > 1) {
+                    String walkMin = String.valueOf(steps[i].duration.inSeconds/60);
+                    mapActivity.addWalkDetail(walkMin);
+
+                } else addArrow = false;
+            }
+            if (steps[i].transitDetails != null) {
+                busCounter++;
+                Log.i("==== LINHA DO ONIBUS", steps[i].transitDetails.line.shortName);
+                String busLine = steps[i].transitDetails.line.shortName;
+                mapActivity.addBusDetail(busLine, busCounter);
+            }
+
+            if(i < stepsNumber - 1 && shouldAddArrow(steps[i+1]) && addArrow){
+                mapActivity.addArrow();
+            }
+        }
+
+        String travelTime = result.routes[fastestRoute].legs[0].duration.toString();
+        mapActivity.makeCardVisible(travelTime);
+    }
+
+    private boolean shouldAddArrow (DirectionsStep nextStep) {
+        if (nextStep.travelMode.toString().equals("walking")) {
+            int walkingDuration = (int) nextStep.duration.inSeconds / 60;
+            return walkingDuration > 1;
+        }
+        return true;
     }
 
     private GeoApiContext getGeoContext() {
