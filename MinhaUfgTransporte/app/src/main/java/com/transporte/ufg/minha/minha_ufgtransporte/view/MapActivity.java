@@ -48,6 +48,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     CardView cardView;
     TextView busLineView;
     TextView travelTimeView;
+    View routeColorView;
     LayoutInflater inflater;
     public LinearLayout routeDetailsView;
 
@@ -76,6 +77,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         busLineView = findViewById(R.id.bus_line);
         travelTimeView = findViewById(R.id.travel_time);
+        routeColorView = findViewById(R.id.route_color);
         cardView = findViewById(R.id.route_information);
         cardView.setVisibility(View.GONE);
 
@@ -194,17 +196,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void makeCardVisible (String travelTime) {
+    public void makeCardVisible (String travelTime, int routeColor) {
 
-//        addWalkDetail(firstWalk);
-//
-//        addArrow();
-//
-//        addBusDetail(busLine);
-//
-//        addArrow();
-//
-//        addWalkDetail(secondWalk);
+        routeColorView.setBackgroundColor(routeColor);
 
         travelTimeView.setText(travelTime);
 

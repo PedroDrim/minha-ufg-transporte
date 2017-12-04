@@ -53,12 +53,14 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
     private Context context;
     private Location lastKnownLocation;
     private MapActivity mapActivity;
+    private String colors[];
 
     public UfgPlaceSelectListener(GoogleMap mMap, Location lastKnownLocation, Context context, MapActivity mapActivity) {
         this.mMap = mMap;
         this.context = context;
         this.lastKnownLocation = lastKnownLocation;
         this.mapActivity = mapActivity;
+        this.colors = this.context.getResources().getStringArray(R.array.colors);
     }
 
     @Override
@@ -67,9 +69,6 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
 
         Log.i("-->User dest lat", String.valueOf(destination.latitude));
         Log.i("-->User dest lng", String.valueOf(destination.longitude));
-
-
-
 
         this.requestRoutes(destination);
     }
@@ -117,22 +116,13 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
     private void showTravelDetails(DirectionsResult result) {
         mapActivity.routeDetailsView.removeAllViews();
 
-        int routesNumber = result.routes.length;
-        long lowerDuration = Long.MAX_VALUE;
-        int fastestRoute = 0;
-
-        for(int n = 0; n < routesNumber; n++){
-            if(result.routes[n].legs[0].duration.inSeconds < lowerDuration){
-                lowerDuration = result.routes[n].legs[0].duration.inSeconds;
-                fastestRoute = n;
-                Log.e("==== FASTEST ROUTE", String.valueOf(fastestRoute) );
-            }
-        }
+        int fastestRoute = findFastestRoute(result);
 
         DirectionsStep[] steps = result.routes[fastestRoute].legs[0].steps;
         int stepsNumber = result.routes[fastestRoute].legs[0].steps.length;
         int busCounter = 0;
         boolean addArrow = true;
+
         for(int i = 0; i < stepsNumber; i++) {
             addArrow = true;
             Log.i("==== Step", steps[i].htmlInstructions);
@@ -160,7 +150,23 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
         }
 
         String travelTime = result.routes[fastestRoute].legs[0].duration.toString();
-        mapActivity.makeCardVisible(travelTime);
+        int routeColor = Color.parseColor(colors[fastestRoute]);
+        mapActivity.makeCardVisible(travelTime, routeColor);
+    }
+
+    private int findFastestRoute(DirectionsResult result) {
+        int routesNumber = result.routes.length;
+        long lowerDuration = Long.MAX_VALUE;
+        int fastestRoute = 0;
+
+        for(int n = 0; n < routesNumber; n++){
+            if(result.routes[n].legs[0].duration.inSeconds < lowerDuration){
+                lowerDuration = result.routes[n].legs[0].duration.inSeconds;
+                fastestRoute = n;
+                Log.e("==== FASTEST ROUTE", String.valueOf(fastestRoute) );
+            }
+        }
+        return fastestRoute;
     }
 
     private boolean shouldAddArrow (DirectionsStep nextStep) {
@@ -190,14 +196,14 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
         return  builder.toString();
     }
 
-    private void addMarkersToMap(DirectionsResult results) {
+    private void addMarkersToMap(DirectionsResult result) {
         mMap.clear();
-        int routesNum = results.routes.length;
+        int routesNum = result.routes.length;
         Marker origin = null;
         Marker destination = null;
 
         for(int i = 0; i < routesNum; i++) {
-            DirectionsLeg leg = results.routes[i].legs[0];
+            DirectionsLeg leg = result.routes[i].legs[0];
 
             origin = this.mMap.addMarker(
                     new MarkerOptions()
@@ -217,7 +223,6 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
         builder.include(origin.getPosition());
         builder.include(destination.getPosition());
 
-
         LatLngBounds bounds = builder.build();
 
         this.mMap.animateCamera(
@@ -227,13 +232,12 @@ public class UfgPlaceSelectListener extends AppCompatActivity implements PlaceSe
         );
     }
 
-    private void addPolyline(DirectionsResult results) {
-        int routesNum = results.routes.length;
-        String colors[] = this.context.getResources().getStringArray(R.array.colors);
+    private void addPolyline(DirectionsResult result) {
+        int routesNum = result.routes.length;
 
         for(int i = 0; i < routesNum; i++) {
             List<LatLng> decodedPath = PolyUtil.decode(
-                    results.routes[i].overviewPolyline.getEncodedPath()
+                    result.routes[i].overviewPolyline.getEncodedPath()
             );
 
             this.mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor(colors[i]))).setZIndex(i);
